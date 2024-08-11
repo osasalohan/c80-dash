@@ -131,21 +131,24 @@ export default function Home() {
                     />
                   </td>
                   <td className="pb-2.5 last:pb-0 pr-[36px]">
-                    <div className="flex items-center">
+                    <div
+                      style={{
+                        borderColor: colors[i % colors.length],
+                        color: colors[i % colors.length],
+                      }}
+                      className="border-[0.5px] bg-opacity-[12%] rounded-[4px] py-[5px] px-[12px] w-[57px] h-[22px] text-small relative"
+                    >
                       <div
-                        className={`border-[0.5px] border-[${
-                          colors[i % colors.length]
-                        }] bg-[${
-                          colors[i % colors.length]
-                        }] bg-opacity-[12%] rounded-[4px] py-[5px] px-[12px] w-[57px] h-[22px] text-small text-[${
-                          colors[i % colors.length]
-                        }]`}
-                      >
-                        {
-                          albums.filter((album) => album.userId === user.id)
-                            .length
-                        }
-                      </div>
+                        className="absolute inset-0"
+                        style={{
+                          backgroundColor: colors[i % colors.length],
+                          opacity: "12%",
+                        }}
+                      ></div>
+                      {
+                        albums.filter((album) => album.userId === user.id)
+                          .length
+                      }
                     </div>
                   </td>
                 </tr>

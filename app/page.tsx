@@ -1,113 +1,183 @@
+"use client";
+
+import { useEffect, useMemo } from "react";
 import Image from "next/image";
 
+import Card from "@/components/Card";
+import BarChart from "@/components/BarChart";
+import AreaChart from "@/components/AreaChart";
+import PieChart from "@/components/PieChart";
+
+import { useStore } from "../store/useStore";
+import ProgressBar from "@/components/ProgressBar";
+
+const colors = ["#FCB859", "#A9DFD8", "#28AEF3", "#F2C8ED"];
+
 export default function Home() {
+  const { users, posts, comments, albums, photos, todos, fetchData } =
+    useStore();
+
+  useEffect(() => {
+    console.log({ users, posts, comments, albums, photos, todos });
+    fetchData();
+  }, [fetchData]);
+
+  const barChartData = useMemo(
+    () =>
+      comments.reduce(
+        (acc: { postId: number; comment: number; post: number }[], curr) => {
+          const existingPost = acc.find((item) => item.postId === curr.postId);
+          if (existingPost) {
+            existingPost.comment += 1;
+          } else {
+            acc.push({ postId: curr.postId, comment: 1, post: 1 });
+          }
+          return acc;
+        },
+        []
+      ),
+    [comments]
+  );
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="bg-black text-white font-inter font-medium min-h-screen flex justify-center p-4">
+      <main className="grow max-w-[757px]">
+        <header className="relative mb-[23px]">
+          <input
+            className="bg-coal rounded-[8px] w-full p-[14.5px] pl-[35px] text-input text-[#D2D2D2] placeholder-[#D2D2D2]"
+            type="text"
+            placeholder="Search here..."
+          />
+          <Image
+            src="/search.svg"
+            alt="search"
+            className="absolute bottom-4 left-4"
+            width={13}
+            height={13}
+          />
+        </header>
+        <div className="flex gap-x-[14px] mb-[14px]">
+          <div className="w-fit bg-coal rounded-[10px] px-[14px] py-5">
+            <h2 className="text-header mb-[5px]">Welcome, Jonas</h2>
+            <p className="text-small text-[#A0A0A0] mb-5">Summary</p>
+            <div className="grid grid-cols-4 gap-x-5">
+              <Card
+                image="/posts.svg"
+                summary={posts.length}
+                text="Total Posts"
+              />
+              <Card
+                image="/comments.svg"
+                summary={comments.length}
+                text="Total Comments"
+              />
+              <Card
+                image="/albums.svg"
+                summary={albums.length}
+                text="Total Albums"
+              />
+              <Card
+                image="/photos.svg"
+                summary={photos.length}
+                text="Total Photos"
+              />
+            </div>
+          </div>
+          <div className="grow bg-coal rounded-[10px] pt-[14px] pb-1 px-[14px] flex flex-col items-center">
+            <h2 className="text-header mb-[22px]">Posts By Comment Volume</h2>
+            <BarChart data={barChartData} />
+          </div>
         </div>
-      </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
+        <div className="w-full bg-coal rounded-[10px] pt-[14px] pb-2 mb-[14px]">
+          <h2 className="text-header mb-[19px] pl-[21px]">
+            Top Users By Album
           </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+          <table className="w-full table-auto text-left">
+            <thead className="text-table text-[#87888C]">
+              <tr className="border-0 border-b border-white border-opacity-[6%]">
+                <th className="pb-2.5 pl-[31.5px] pr-[79.5px]">#</th>
+                <th className="pb-2.5 pr-[91.5px]">Name</th>
+                <th className="pb-2.5 pr-[54px]">Photos</th>
+                <th className="pb-2.5 pr-[42px]">Albums</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user, i) => (
+                <tr
+                  className="border-b border-white border-opacity-[6%] last:border-0"
+                  key={user.id}
+                >
+                  <td className="pt-2 pb-2.5 last:pb-0 pl-[27px] pr-[75px]">
+                    {user.id.toLocaleString("en-US", {
+                      minimumIntegerDigits: 2,
+                    })}
+                  </td>
+                  <td className="pt-2 pb-2.5 last:pb-0 text-small pr-[91.5px]">
+                    {user.name}
+                  </td>
+                  <td className="pt-2 pb-2.5 last:pb-0 pr-[54px]">
+                    <ProgressBar
+                      color={colors[i % colors.length]}
+                      progress={
+                        (photos.filter((photo) =>
+                          albums
+                            .filter((album) => album.userId === user.id)
+                            .map((album) => album.id)
+                            .includes(photo.albumId)
+                        ).length /
+                          photos.length) *
+                        100
+                      }
+                    />
+                  </td>
+                  <td className="pb-2.5 last:pb-0 pr-[36px]">
+                    <div className="flex items-center">
+                      <div
+                        className={`border-[0.5px] border-[${
+                          colors[i % colors.length]
+                        }] bg-[${
+                          colors[i % colors.length]
+                        }] bg-opacity-[12%] rounded-[4px] py-[5px] px-[12px] w-[57px] h-[22px] text-small text-[${
+                          colors[i % colors.length]
+                        }]`}
+                      >
+                        {
+                          albums.filter((album) => album.userId === user.id)
+                            .length
+                        }
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex gap-x-[14px] mb-[14px]">
+          <div className="w-[238px] bg-coal rounded-[10px] p-[14px] relative overflow-hidden">
+            <h2 className="text-header mb-[5px]">Todo</h2>
+            <p className="text-small text-[#87888C] mb-[9px]">Total Todos</p>
+            <h3 className="text-large text-[#A9DFD8] mb-[9px]">
+              {todos.length}
+            </h3>
+            <p className="text-medium text-[#87888C] mb-[7px]">
+              Completed Todos / Total
+            </p>
+            <div className="w-full h-[170px] absolute bottom-[-48px] left-[-6px]">
+              <PieChart
+                value={todos.filter((todo) => todo.completed).length}
+                max={todos.length}
+              />
+            </div>
+          </div>
+          <div className="grow bg-coal rounded-[10px] pt-[14px] pl-[14px] pb-[15px] h-[247px]">
+            <h2 className="text-header mb-[25px]">Post Insights</h2>
+            <div className="w-full h-[175px]">
+              <AreaChart />
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
   );
 }
